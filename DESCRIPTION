@@ -23,3 +23,4 @@ Imports:
     lubridate,
     readr
 RoxygenNote: 7.2.3
+URL: https://kth-library.github.io/meili/
