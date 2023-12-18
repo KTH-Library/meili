@@ -1,0 +1,25 @@
+Package: meili
+Type: Package
+Title: Search MeiliSearch Index
+Version: 0.1.0
+Authors@R: 
+    as.person(c(
+        "Markus Skyttner <markussk@kth.se> [cre,aut]"
+    ))
+Maintainer: Markus Skyttner <markussk@kth.se>
+Description: Functions to allow making search request against MeiliSearch.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    testthat (>= 3.0.0),
+    tibble
+Config/testthat/edition: 3
+Imports: 
+    dplyr,
+    httr2,
+    purrr,
+    tidyr,
+    lubridate,
+    readr
+RoxygenNote: 7.2.3

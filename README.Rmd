@@ -1,0 +1,89 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# meili
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
+[Meilisearch](https://meilisearch.com) is a RESTful search API. It aims to be a ready-to-go solution for everyone who wants a fast and relevant search experience.
+
+The goal of the R package `meili` is to provide an R client which is an API wrapper against the `meilisearch` API, see <https://www.meilisearch.com/docs/reference/api/overview>.
+
+## Installation
+
+You can install the development version of meili like so:
+
+``` r
+remotes::install_github("KTH-Library/meili")
+```
+
+## Environment variables
+
+This package expects two environment variables to be set in `.Renviron`:
+
+MEILI_KEY: The key used to authorize API requests, see [the API docs](https://www.meilisearch.com/docs/learn/security/master_api_keys#communicating-with-a-protected-instance)
+
+MEILI_URL: The public server name where the meilisearch index is accessible
+
+Settings used can be checked using `meili::meili_config(verbose = TRUE)`
+
+## Example
+
+This is a basic example which shows you how to create a search index, retrieve documents from it and finally delete it:
+
+```{r example}
+library(meili)
+library(dplyr)
+library(tibble)
+
+# verify settings
+
+my_config <- meili:::meili_config(verbose = TRUE)
+
+# ingest an in-memory data frame or an on-disk CSV file
+
+co2 <- CO2 |> rownames_to_column(var = "rowid")
+task <- meili:::meili_ingest_csv(index = "co2", csvfile = co2)
+is_ingested <- meili:::wait_for_status(task$taskUid)
+
+# retrieve three documents from the co2 index
+meili:::meili_documents("co2", limit = 3) |> 
+  select(-any_of("rowid"))
+
+# run a search for documents matching "quebec 95" w scores > 0.5 (on scale 0..1)
+meili:::meili_search("co2", query = "quebec 95") |> 
+  filter(`_rankingScore` > 0.5)
+
+# delete the index
+
+task <- meili:::meili_deleteindex("co2")
+is_deleted <- meili:::wait_for_status(task$taskUid)
+
+
+```
+
+## Searching using several queries
+
+To make multiple search queries against the same index:
+
+```{r example2}
+
+meili:::search_name(c("Oscar", "backe"), index = "hrfile") |> 
+  select(lastname, unit_name) |> 
+  head(6)
+
+```
