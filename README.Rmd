@@ -59,7 +59,7 @@ my_config <- meili:::meili_config(verbose = TRUE)
 
 co2 <- CO2 |> rownames_to_column(var = "rowid")
 task <- meili:::meili_ingest_csv(index = "co2", csvfile = co2)
-is_ingested <- meili:::wait_for_status(task$taskUid)
+is_ingested <- meili:::wait_for_task(task$taskUid)
 
 # retrieve three documents from the co2 index
 meili:::meili_documents("co2", limit = 3) |> 
@@ -72,7 +72,7 @@ meili:::meili_search("co2", query = "quebec 95") |>
 # delete the index
 
 task <- meili:::meili_deleteindex("co2")
-is_deleted <- meili:::wait_for_status(task$taskUid)
+is_deleted <- meili:::wait_for_task(task$taskUid)
 
 
 ```
@@ -84,7 +84,22 @@ To make multiple search queries against the same index:
 ```{r example2}
 
 meili:::search_name(c("Oscar", "backe"), index = "hrfile") |> 
-  select(lastname, unit_name) |> 
+  select(fullname, unit_name) |> 
   head(6)
+
+```
+
+In order to be able to filter on attributes, first the fields that should be possible to use as filtered attributes needs to be defined (this triggers a reindexing in the background):
+
+```{r example3, eval=FALSE}
+
+# make meili aware of filterable attributes for a specific index
+meili:::meili_index_create_filters("hrfile", fields = c("unit_abbr", "title_en"))
+
+# these attributes can now be used in filters, for example:
+meili_documents("hrfile", limit = 3e4, 
+  fields = c("kthid", "title_en", "unit_abbr"), 
+  filter = "unit_abbr = ITM"
+) 
 
 ```

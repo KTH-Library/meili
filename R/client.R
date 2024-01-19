@@ -87,6 +87,19 @@ meili_indexes <- function() {
     mutate(across(ends_with("At"), \(x) parse_ts(x)))
 }
 
+meili_index_create_filters <- function(index, fields) {
+
+  res <-
+    meili_req(path = sprintf("indexes/%s/settings/filterable-attributes", index)) |>
+    req_body_json(fields) |>
+    req_method("PUT") |>
+    req_perform() |>
+    resp_body_json()
+
+  res
+}
+
+
 meili_index <- function(index) {
 
   route <- sprintf("/indexes/%s", index)
@@ -131,12 +144,16 @@ meili_document <- function(index, document, fields = "*") {
     req_perform() |>
     resp_body_json()
 
-  res |> bind_rows()
+  structure(res |> bind_rows(), res)
 }
 
-meili_ingest_csv <- function(index, csvfile) {
+meili_ingest_csv <- function(index, csvfile, primary_key) {
 
   if (is.data.frame(csvfile)) {
+    if (missing(primary_key)) {
+      csvfile <- csvfile |> dplyr::add_rownames(var = "rowid")
+      primary_key <- "rowid"
+    }
     tf <- tempfile(fileext = ".csv")
     readr::write_csv(csvfile, tf, na = "", quote = "all", escape = "double")
     on.exit(unlink(tf))
@@ -151,6 +168,7 @@ meili_ingest_csv <- function(index, csvfile) {
   res <-
     meili_req(path = route) |>
     req_headers(`Content-Type` = "text/csv") |>
+    req_url_query(primaryKey = primary_key) |>
     req_body_file(csvfile) |>
     req_perform() |>
     resp_body_json()
@@ -158,7 +176,7 @@ meili_ingest_csv <- function(index, csvfile) {
   res
 }
 
-wait_for_status <- function(task, verbose = FALSE) {
+wait_for_task <- function(task, verbose = FALSE) {
   t <- meili_task(task)
   while (t$overview$status != "succeeded") {
     if (nrow(t$error) > 0) {
@@ -175,13 +193,43 @@ wait_for_status <- function(task, verbose = FALSE) {
 
 #' @importFrom dplyr bind_rows select any_of
 #' @importFrom purrr map_df map
-meili_tasks <- function() {
+meili_tasks <- function(limit = 20L, from = NULL, uids = NULL,
+  statuses = NULL, types = NULL, index_ids = NULL,
+  canceled_by = NULL,
+  before_enqueued_at = NULL,
+  before_started_at = NULL,
+  before_finished_at = NULL,
+  after_enqueued_at = NULL,
+  after_started_at = NULL,
+  after_finished_at = NULL) {
+
+  params <- list(
+    limit = limit,
+    from = from,
+    uids = uids,
+    statuses = statuses,
+    types = types,
+    indexUids = index_ids,
+    canceledBy = canceled_by,
+    beforeEnqueuedAt = before_enqueued_at,
+    beforeStartedAt = before_started_at,
+    beforeFinishedAt = before_finished_at,
+    afterEnqueuedAt = after_enqueued_at,
+    afterStartedAt = after_started_at,
+    afterFinishedAt = after_finished_at
+  )
+
+  params <- purrr::compact(params)
+
+  print(params)
 
   res <-
     meili_req(path = "tasks") |>
+    req_url_query(!!!params, .multi = "comma") |>
     req_perform() |>
     resp_body_json()
 
+#  res
   res$results |> map(parse_task)
 #    purrr::modify_if(.p = \(x) is.null(x), .f = \(x) NA) #|>
 #    bind_rows() |>
@@ -201,7 +249,10 @@ meili_task <- function(task) {
 
 parse_task <- function(res) {
 
-  details <- res$details |> bind_rows()
+  details <-
+    res$details |>
+    purrr::discard_at("filterableAttributes") |>
+    bind_rows()
 
   error <- res$error |> bind_rows()
 
@@ -309,7 +360,7 @@ meili_search <- function(
     req_perform() |>
     resp_body_json()
 
-  res$hits |> dplyr::bind_rows()
+  structure(res$hits |> dplyr::bind_rows(), meta = res)
 }
 
 meili_health <- function() {
