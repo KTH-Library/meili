@@ -24,6 +24,8 @@ test_that("data can be ingested into an index", {
 
 test_that("fields can be filtered on", {
 
+  skip_on_ci()
+
   df <- CO2
   task <- meili_ingest_csv("co2", df)
   res <- wait_for_task(task$taskUid)

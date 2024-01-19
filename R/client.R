@@ -151,7 +151,7 @@ meili_ingest_csv <- function(index, csvfile, primary_key) {
 
   if (is.data.frame(csvfile)) {
     if (missing(primary_key)) {
-      csvfile <- csvfile |> dplyr::add_rownames(var = "rowid")
+      csvfile <- csvfile |> tibble::rowid_to_column(var = "rowid")
       primary_key <- "rowid"
     }
     tf <- tempfile(fileext = ".csv")
