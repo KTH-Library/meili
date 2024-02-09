@@ -134,11 +134,18 @@ meili_document <- function(index, document, fields = "*") {
   res |> bind_rows()
 }
 
+
+#' Ingest data into Meili index
+#'
+#' @param index the name of the index to ingest data in
+#' @param csvfile the name of a dataframe or a csv file to ingest into index
+#' @import readr httr2
+#' @export
 meili_ingest_csv <- function(index, csvfile) {
 
   if (is.data.frame(csvfile)) {
     tf <- tempfile(fileext = ".csv")
-    readr::write_csv(csvfile, tf, na = "", quote = "all", escape = "double")
+    write_csv(csvfile, tf, na = "", quote = "all", escape = "double")
     on.exit(unlink(tf))
     csvfile <- tf
   }
