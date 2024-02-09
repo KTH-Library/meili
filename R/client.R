@@ -165,6 +165,14 @@ meili_ingest_csv <- function(index, csvfile) {
   res
 }
 
+#' Wait for status of a Meili task
+#'
+#' Returns TRUE if no problem, returns FALSE and
+#' writes an error message if an error occured
+#'
+#' @param task the identifying number of the task
+#' @param verbose set to TRUE for more talkative output
+#' @export
 wait_for_status <- function(task, verbose = FALSE) {
   t <- meili_task(task)
   while (t$overview$status != "succeeded") {

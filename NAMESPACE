@@ -2,6 +2,7 @@
 
 export(meili_ingest_csv)
 export(search_name)
+export(wait_for_status)
 import(dplyr)
 import(httr2)
 import(readr)
