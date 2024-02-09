@@ -321,7 +321,12 @@ meili_health <- function() {
   res$status == "available"
 }
 
+#' Search for a name in hrfile (or other index)
+#'
+#' @param q the string to search for
+#' @param index the index to search in, default hrfile
 #' @importFrom purrr map_df
+#' @export
 search_name <- function(q, index = "hrfile") {
   s <- \(q) meili_search(index, query = q)
   q |> purrr::map_df(s)
