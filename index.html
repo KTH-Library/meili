@@ -100,7 +100,7 @@
 <span></span>
 <span><span class="va">co2</span> <span class="op">&lt;-</span> <span class="va">CO2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"rowid"</span><span class="op">)</span></span>
 <span><span class="va">task</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/meili_ingest_csv.html">meili_ingest_csv</a></span><span class="op">(</span>index <span class="op">=</span> <span class="st">"co2"</span>, csvfile <span class="op">=</span> <span class="va">co2</span><span class="op">)</span></span>
-<span><span class="va">is_ingested</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu">wait_for_status</span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span>
+<span><span class="va">is_ingested</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/wait_for_status.html">wait_for_status</a></span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># retrieve three documents from the co2 index</span></span>
 <span><span class="fu">meili</span><span class="fu">:::</span><span class="fu">meili_documents</span><span class="op">(</span><span class="st">"co2"</span>, limit <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -128,7 +128,7 @@
 <span><span class="co"># delete the index</span></span>
 <span></span>
 <span><span class="va">task</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu">meili_deleteindex</span><span class="op">(</span><span class="st">"co2"</span><span class="op">)</span></span>
-<span><span class="va">is_deleted</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu">wait_for_status</span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">is_deleted</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/wait_for_status.html">wait_for_status</a></span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="searching-using-several-queries">Searching using several queries<a class="anchor" aria-label="anchor" href="#searching-using-several-queries"></a>
