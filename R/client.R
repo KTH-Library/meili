@@ -147,18 +147,14 @@ meili_document <- function(index, document, fields = "*") {
   structure(res |> bind_rows(), res)
 }
 
-<<<<<<< HEAD
-meili_ingest_csv <- function(index, csvfile, primary_key) {
-=======
-
 #' Ingest data into Meili index
 #'
 #' @param index the name of the index to ingest data in
 #' @param csvfile the name of a dataframe or a csv file to ingest into index
+#' @param primary_key the field to use as primary key in the index
 #' @import readr httr2
 #' @export
-meili_ingest_csv <- function(index, csvfile) {
->>>>>>> main
+meili_ingest_csv <- function(index, csvfile, primary_key) {
 
   if (is.data.frame(csvfile)) {
     if (missing(primary_key)) {
@@ -187,9 +183,6 @@ meili_ingest_csv <- function(index, csvfile) {
   res
 }
 
-<<<<<<< HEAD
-wait_for_task <- function(task, verbose = FALSE) {
-=======
 #' Wait for status of a Meili task
 #'
 #' Returns TRUE if no problem, returns FALSE and
@@ -198,8 +191,8 @@ wait_for_task <- function(task, verbose = FALSE) {
 #' @param task the identifying number of the task
 #' @param verbose set to TRUE for more talkative output
 #' @export
-wait_for_status <- function(task, verbose = FALSE) {
->>>>>>> main
+ wait_for_status <- function(task, verbose = FALSE) {
+
   t <- meili_task(task)
   while (t$overview$status != "succeeded") {
     if (nrow(t$error) > 0) {

@@ -10,5 +10,4 @@ library(testthat)
 library(meili)
 library(tibble)
 
-
 test_check("meili")
