@@ -87,6 +87,12 @@ meili_indexes <- function() {
     mutate(across(ends_with("At"), \(x) parse_ts(x)))
 }
 
+#' Create filter(s) on Meilisearch index
+#'
+#' @param index the index to create filters in
+#' @param fields the fields to create filters on
+#' @import httr2
+#' @export
 meili_index_create_filters <- function(index, fields) {
 
   res <-
