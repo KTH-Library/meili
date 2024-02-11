@@ -147,7 +147,18 @@ meili_document <- function(index, document, fields = "*") {
   structure(res |> bind_rows(), res)
 }
 
+<<<<<<< HEAD
 meili_ingest_csv <- function(index, csvfile, primary_key) {
+=======
+
+#' Ingest data into Meili index
+#'
+#' @param index the name of the index to ingest data in
+#' @param csvfile the name of a dataframe or a csv file to ingest into index
+#' @import readr httr2
+#' @export
+meili_ingest_csv <- function(index, csvfile) {
+>>>>>>> main
 
   if (is.data.frame(csvfile)) {
     if (missing(primary_key)) {
@@ -155,7 +166,7 @@ meili_ingest_csv <- function(index, csvfile, primary_key) {
       primary_key <- "rowid"
     }
     tf <- tempfile(fileext = ".csv")
-    readr::write_csv(csvfile, tf, na = "", quote = "all", escape = "double")
+    write_csv(csvfile, tf, na = "", quote = "all", escape = "double")
     on.exit(unlink(tf))
     csvfile <- tf
   }
@@ -176,7 +187,19 @@ meili_ingest_csv <- function(index, csvfile, primary_key) {
   res
 }
 
+<<<<<<< HEAD
 wait_for_task <- function(task, verbose = FALSE) {
+=======
+#' Wait for status of a Meili task
+#'
+#' Returns TRUE if no problem, returns FALSE and
+#' writes an error message if an error occured
+#'
+#' @param task the identifying number of the task
+#' @param verbose set to TRUE for more talkative output
+#' @export
+wait_for_status <- function(task, verbose = FALSE) {
+>>>>>>> main
   t <- meili_task(task)
   while (t$overview$status != "succeeded") {
     if (nrow(t$error) > 0) {
@@ -372,7 +395,12 @@ meili_health <- function() {
   res$status == "available"
 }
 
+#' Search for a name in hrfile (or other index)
+#'
+#' @param q the string to search for
+#' @param index the index to search in, default hrfile
 #' @importFrom purrr map_df
+#' @export
 search_name <- function(q, index = "hrfile") {
   s <- \(q) meili_search(index, query = q)
   q |> purrr::map_df(s)

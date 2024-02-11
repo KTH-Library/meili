@@ -22,5 +22,5 @@ Imports:
     tidyr,
     lubridate,
     readr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 URL: https://kth-library.github.io/meili/
