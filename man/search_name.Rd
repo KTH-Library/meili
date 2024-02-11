@@ -2,15 +2,17 @@
 % Please edit documentation in R/client.R
 \name{search_name}
 \alias{search_name}
-\title{Search for a name in hrfile (or other index)}
+\title{Search for a name in hrfile (or other index) with optional filters}
 \usage{
-search_name(q, index = "hrfile")
+search_name(q, index = "hrfile", f = NULL)
 }
 \arguments{
 \item{q}{the string to search for}
 
 \item{index}{the index to search in, default hrfile}
+
+\item{f}{filters to apply before search (optional)}
 }
 \description{
-Search for a name in hrfile (or other index)
+Search for a name in hrfile (or other index) with optional filters
 }
