@@ -100,7 +100,7 @@
 <span></span>
 <span><span class="va">co2</span> <span class="op">&lt;-</span> <span class="va">CO2</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span>var <span class="op">=</span> <span class="st">"rowid"</span><span class="op">)</span></span>
 <span><span class="va">task</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/meili_ingest_csv.html">meili_ingest_csv</a></span><span class="op">(</span>index <span class="op">=</span> <span class="st">"co2"</span>, csvfile <span class="op">=</span> <span class="va">co2</span><span class="op">)</span></span>
-<span><span class="va">is_ingested</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/wait_for_status.html">wait_for_status</a></span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span>
+<span><span class="va">is_ingested</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu">wait_for_task</span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># retrieve three documents from the co2 index</span></span>
 <span><span class="fu">meili</span><span class="fu">:::</span><span class="fu">meili_documents</span><span class="op">(</span><span class="st">"co2"</span>, limit <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -128,7 +128,7 @@
 <span><span class="co"># delete the index</span></span>
 <span></span>
 <span><span class="va">task</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu">meili_deleteindex</span><span class="op">(</span><span class="st">"co2"</span><span class="op">)</span></span>
-<span><span class="va">is_deleted</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/wait_for_status.html">wait_for_status</a></span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">is_deleted</span> <span class="op">&lt;-</span> <span class="fu">meili</span><span class="fu">:::</span><span class="fu">wait_for_task</span><span class="op">(</span><span class="va">task</span><span class="op">$</span><span class="va">taskUid</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="searching-using-several-queries">Searching using several queries<a class="anchor" aria-label="anchor" href="#searching-using-several-queries"></a>
@@ -137,17 +137,28 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/search_name.html">search_name</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Oscar"</span>, <span class="st">"backe"</span><span class="op">)</span>, index <span class="op">=</span> <span class="st">"hrfile"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">lastname</span>, <span class="va">unit_name</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">fullname</span>, <span class="va">unit_name</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 6 × 2</span></span>
-<span><span class="co">#&gt;   lastname  unit_name                  </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;     &lt;chr&gt;                      </span></span>
-<span><span class="co">#&gt; 1 OSCARSON  ABE SKOLAN                 </span></span>
-<span><span class="co">#&gt; 2 OSCARSSON ABE SKOLAN                 </span></span>
-<span><span class="co">#&gt; 3 OSCARSSON CBH-SKOLAN                 </span></span>
-<span><span class="co">#&gt; 4 OSCARSON  ABE SKOLAN                 </span></span>
-<span><span class="co">#&gt; 5 OSCARSSON BROBYGGNAD INKL STÅLBYGGNAD</span></span>
-<span><span class="co">#&gt; 6 OSCARSSON EECS SKOLAN</span></span></code></pre></div>
+<span><span class="co">#&gt;   fullname              unit_name                </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                 &lt;chr&gt;                    </span></span>
+<span><span class="co">#&gt; 1 Tjernberg, Oscar      MATERIAL- OCH NANOFYSIK  </span></span>
+<span><span class="co">#&gt; 2 Hessling, Oscar       ENHETEN PROCESSER        </span></span>
+<span><span class="co">#&gt; 3 Danielsson, Oscar     EECS SKOLAN              </span></span>
+<span><span class="co">#&gt; 4 Skirfors, Oscar       MOBILITET OCH PARTNERSKAP</span></span>
+<span><span class="co">#&gt; 5 Wasström, Oscar       ABE SKOLAN               </span></span>
+<span><span class="co">#&gt; 6 Rohde Dahlberg, Oscar KTH</span></span></code></pre></div>
+<p>In order to be able to filter on attributes, first the fields that should be possible to use as filtered attributes needs to be defined (this triggers a reindexing in the background):</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># make meili aware of filterable attributes for a specific index</span></span>
+<span><span class="fu">meili</span><span class="fu">:::</span><span class="fu"><a href="reference/meili_index_create_filters.html">meili_index_create_filters</a></span><span class="op">(</span><span class="st">"hrfile"</span>, fields <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"unit_abbr"</span>, <span class="st">"title_en"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># these attributes can now be used in filters, for example:</span></span>
+<span><span class="fu">meili_documents</span><span class="op">(</span><span class="st">"hrfile"</span>, limit <span class="op">=</span> <span class="fl">3e4</span>, </span>
+<span>  fields <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"kthid"</span>, <span class="st">"title_en"</span>, <span class="st">"unit_abbr"</span><span class="op">)</span>, </span>
+<span>  filter <span class="op">=</span> <span class="st">"unit_abbr = ITM"</span></span>
+<span><span class="op">)</span> </span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
