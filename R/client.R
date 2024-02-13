@@ -402,8 +402,8 @@ meili_health <- function() {
 #' @importFrom purrr map_df
 #' @export
 simple_search <- function(index, q, f = NULL) {
-  s <- \(q) meili:::meili_search(index = index,
-                                 query = q,
-                                 filter = f)
+  s <- \(q) meili_search(index = index,
+                         query = q,
+                         filter = f)
   q |> purrr::map_df(s)
 }
