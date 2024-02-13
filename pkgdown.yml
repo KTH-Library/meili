@@ -2,7 +2,7 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-02-13T15:45Z
+last_built: 2024-02-13T16:17Z
 urls:
   reference: https://kth-library.github.io/meili/reference
   article: https://kth-library.github.io/meili/articles
