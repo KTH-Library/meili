@@ -9,9 +9,9 @@ simple_search(index, q, f = NULL)
 \arguments{
 \item{index}{the index to search in}
 
-\item{q}{a string to search for}
+\item{q}{a string or list of strings to search for}
 
-\item{filter}{filters to apply before search (optional)}
+\item{f}{filter(s) to apply before search (optional)}
 }
 \description{
 Simple search in Meilisearch index

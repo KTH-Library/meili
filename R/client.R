@@ -397,8 +397,8 @@ meili_health <- function() {
 #' Simple search in Meilisearch index
 #'
 #' @param index the index to search in
-#' @param q a string to search for
-#' @param filter filters to apply before search (optional)
+#' @param q a string or list of strings to search for
+#' @param f filter(s) to apply before search (optional)
 #' @importFrom purrr map_df
 #' @export
 simple_search <- function(index, q, f = NULL) {
