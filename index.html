@@ -136,7 +136,7 @@
 <p>To make multiple search queries against the same index:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu">meili</span><span class="fu">:::</span><span class="fu">search_name</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Oscar"</span>, <span class="st">"backe"</span><span class="op">)</span>, index <span class="op">=</span> <span class="st">"hrfile"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="fu"><a href="reference/simple_search.html">simple_search</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Oscar"</span>, <span class="st">"backe"</span><span class="op">)</span>, index <span class="op">=</span> <span class="st">"hrfile"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">fullname</span>, <span class="va">unit_name</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span></span>
 <span><span class="co">#&gt; # A tibble: 6 × 2</span></span>
