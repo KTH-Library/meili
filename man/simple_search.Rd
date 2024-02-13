@@ -11,7 +11,7 @@ simple_search(index, q, f = NULL)
 
 \item{q}{a string to search for}
 
-\item{f}{filters to apply before search (optional)}
+\item{filter}{filters to apply before search (optional)}
 }
 \description{
 Simple search in Meilisearch index

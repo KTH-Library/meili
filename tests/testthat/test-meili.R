@@ -55,7 +55,7 @@ test_that("fields can be filtered on", {
 
 test_that("name can be searched", {
   skip_on_ci()
-  res <- search_name("Maguire")
+  res <- simple_search("Maguire", index = "hrfile")
   is_valid <- nrow(res) > 0
   expect_true(is_valid)
 })

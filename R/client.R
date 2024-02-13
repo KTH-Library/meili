@@ -394,15 +394,16 @@ meili_health <- function() {
   res$status == "available"
 }
 
-
 #' Simple search in Meilisearch index
 #'
 #' @param index the index to search in
 #' @param q a string to search for
-#' @param f filters to apply before search (optional)
+#' @param filter filters to apply before search (optional)
+#' @importFrom purrr map_df
 #' @export
 simple_search <- function(index, q, f = NULL) {
-  meili_search(index = index,
-               query = q,
-               filter = f)
+  s <- \(q) meili:::meili_search(index = index,
+                                 query = q,
+                                 filter = f)
+  q |> purrr::map_df(s)
 }

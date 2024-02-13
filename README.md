@@ -104,7 +104,7 @@ To make multiple search queries against the same index:
 
 ``` r
 
-meili:::search_name(c("Oscar", "backe"), index = "hrfile") |> 
+simple_search(c("Oscar", "backe"), index = "hrfile") |> 
   select(fullname, unit_name) |> 
   head(6)
 #> # A tibble: 6 × 2
