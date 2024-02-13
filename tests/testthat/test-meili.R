@@ -10,7 +10,7 @@ test_that("data can be ingested into an index", {
   # we create an index, ingest it and check the status, then delete it
   skip_on_ci()
 
-  df <- CO2 |> tibble::rownames_to_column(var = "rowid")
+  df <- CO2
   task <- meili_ingest_csv("co2", df)
   res <- wait_for_status(task$taskUid)
 
@@ -19,6 +19,37 @@ test_that("data can be ingested into an index", {
   task <- meili_deleteindex("co2")
   is_deleted <- wait_for_status(task$taskUid)
   expect_true(is_ingested && is_deleted)
+
+})
+
+test_that("fields can be filtered on", {
+
+  skip_on_ci()
+
+  df <- CO2
+  task <- meili_ingest_csv("co2", df)
+  res <- wait_for_status(task$taskUid)
+
+  is_ingested <- all(meili_documents("co2")$rowid == as.character(1:20))
+
+
+  fields <-
+    meili_documents("co2", limit = 1e2) |>
+    names()
+
+  fields <- fields[-which("rowid" %in% fields)]
+
+  task <- meili_index_create_filters("co2", fields)
+  res <- wait_for_status(task$taskUid)
+
+  search <- meili_documents("co2", filter = "Treatment = chilled")
+
+  task <- meili_deleteindex("co2")
+  is_deleted <- wait_for_status(task$taskUid)
+
+  is_valid <- is_deleted & nrow(search) >= 20
+
+  expect_true(is_valid)
 
 })
 

@@ -4,12 +4,14 @@
 \alias{meili_ingest_csv}
 \title{Ingest data into Meili index}
 \usage{
-meili_ingest_csv(index, csvfile)
+meili_ingest_csv(index, csvfile, primary_key)
 }
 \arguments{
 \item{index}{the name of the index to ingest data in}
 
 \item{csvfile}{the name of a dataframe or a csv file to ingest into index}
+
+\item{primary_key}{the field to use as primary key in the index}
 }
 \description{
 Ingest data into Meili index

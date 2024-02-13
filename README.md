@@ -67,7 +67,7 @@ my_config <- meili:::meili_config(verbose = TRUE)
 
 co2 <- CO2 |> rownames_to_column(var = "rowid")
 task <- meili:::meili_ingest_csv(index = "co2", csvfile = co2)
-is_ingested <- meili:::wait_for_status(task$taskUid)
+is_ingested <- meili:::wait_for_task(task$taskUid)
 
 # retrieve three documents from the co2 index
 meili:::meili_documents("co2", limit = 3) |> 
@@ -95,7 +95,7 @@ meili:::meili_search("co2", query = "quebec 95") |>
 # delete the index
 
 task <- meili:::meili_deleteindex("co2")
-is_deleted <- meili:::wait_for_status(task$taskUid)
+is_deleted <- meili:::wait_for_task(task$taskUid)
 ```
 
 ## Searching using several queries
@@ -105,15 +105,31 @@ To make multiple search queries against the same index:
 ``` r
 
 meili:::search_name(c("Oscar", "backe"), index = "hrfile") |> 
-  select(lastname, unit_name) |> 
+  select(fullname, unit_name) |> 
   head(6)
 #> # A tibble: 6 × 2
-#>   lastname  unit_name                  
-#>   <chr>     <chr>                      
-#> 1 OSCARSON  ABE SKOLAN                 
-#> 2 OSCARSSON ABE SKOLAN                 
-#> 3 OSCARSSON CBH-SKOLAN                 
-#> 4 OSCARSON  ABE SKOLAN                 
-#> 5 OSCARSSON BROBYGGNAD INKL STÅLBYGGNAD
-#> 6 OSCARSSON EECS SKOLAN
+#>   fullname              unit_name                
+#>   <chr>                 <chr>                    
+#> 1 Tjernberg, Oscar      MATERIAL- OCH NANOFYSIK  
+#> 2 Hessling, Oscar       ENHETEN PROCESSER        
+#> 3 Danielsson, Oscar     EECS SKOLAN              
+#> 4 Skirfors, Oscar       MOBILITET OCH PARTNERSKAP
+#> 5 Wasström, Oscar       ABE SKOLAN               
+#> 6 Rohde Dahlberg, Oscar KTH
+```
+
+In order to be able to filter on attributes, first the fields that
+should be possible to use as filtered attributes needs to be defined
+(this triggers a reindexing in the background):
+
+``` r
+
+# make meili aware of filterable attributes for a specific index
+meili:::meili_index_create_filters("hrfile", fields = c("unit_abbr", "title_en"))
+
+# these attributes can now be used in filters, for example:
+meili_documents("hrfile", limit = 3e4, 
+  fields = c("kthid", "title_en", "unit_abbr"), 
+  filter = "unit_abbr = ITM"
+) 
 ```

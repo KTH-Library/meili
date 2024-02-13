@@ -87,6 +87,25 @@ meili_indexes <- function() {
     mutate(across(ends_with("At"), \(x) parse_ts(x)))
 }
 
+#' Create filter(s) on Meilisearch index
+#'
+#' @param index the index to create filters in
+#' @param fields the fields to create filters on
+#' @import httr2
+#' @export
+meili_index_create_filters <- function(index, fields) {
+
+  res <-
+    meili_req(path = sprintf("indexes/%s/settings/filterable-attributes", index)) |>
+    req_body_json(fields) |>
+    req_method("PUT") |>
+    req_perform() |>
+    resp_body_json()
+
+  res
+}
+
+
 meili_index <- function(index) {
 
   route <- sprintf("/indexes/%s", index)
@@ -131,19 +150,23 @@ meili_document <- function(index, document, fields = "*") {
     req_perform() |>
     resp_body_json()
 
-  res |> bind_rows()
+  structure(res |> bind_rows(), res)
 }
-
 
 #' Ingest data into Meili index
 #'
 #' @param index the name of the index to ingest data in
 #' @param csvfile the name of a dataframe or a csv file to ingest into index
+#' @param primary_key the field to use as primary key in the index
 #' @import readr httr2
 #' @export
-meili_ingest_csv <- function(index, csvfile) {
+meili_ingest_csv <- function(index, csvfile, primary_key) {
 
   if (is.data.frame(csvfile)) {
+    if (missing(primary_key)) {
+      csvfile <- csvfile |> tibble::rowid_to_column(var = "rowid")
+      primary_key <- "rowid"
+    }
     tf <- tempfile(fileext = ".csv")
     write_csv(csvfile, tf, na = "", quote = "all", escape = "double")
     on.exit(unlink(tf))
@@ -158,6 +181,7 @@ meili_ingest_csv <- function(index, csvfile) {
   res <-
     meili_req(path = route) |>
     req_headers(`Content-Type` = "text/csv") |>
+    req_url_query(primaryKey = primary_key) |>
     req_body_file(csvfile) |>
     req_perform() |>
     resp_body_json()
@@ -173,7 +197,8 @@ meili_ingest_csv <- function(index, csvfile) {
 #' @param task the identifying number of the task
 #' @param verbose set to TRUE for more talkative output
 #' @export
-wait_for_status <- function(task, verbose = FALSE) {
+ wait_for_status <- function(task, verbose = FALSE) {
+
   t <- meili_task(task)
   while (t$overview$status != "succeeded") {
     if (nrow(t$error) > 0) {
@@ -190,13 +215,43 @@ wait_for_status <- function(task, verbose = FALSE) {
 
 #' @importFrom dplyr bind_rows select any_of
 #' @importFrom purrr map_df map
-meili_tasks <- function() {
+meili_tasks <- function(limit = 20L, from = NULL, uids = NULL,
+  statuses = NULL, types = NULL, index_ids = NULL,
+  canceled_by = NULL,
+  before_enqueued_at = NULL,
+  before_started_at = NULL,
+  before_finished_at = NULL,
+  after_enqueued_at = NULL,
+  after_started_at = NULL,
+  after_finished_at = NULL) {
+
+  params <- list(
+    limit = limit,
+    from = from,
+    uids = uids,
+    statuses = statuses,
+    types = types,
+    indexUids = index_ids,
+    canceledBy = canceled_by,
+    beforeEnqueuedAt = before_enqueued_at,
+    beforeStartedAt = before_started_at,
+    beforeFinishedAt = before_finished_at,
+    afterEnqueuedAt = after_enqueued_at,
+    afterStartedAt = after_started_at,
+    afterFinishedAt = after_finished_at
+  )
+
+  params <- purrr::compact(params)
+
+  print(params)
 
   res <-
     meili_req(path = "tasks") |>
+    req_url_query(!!!params, .multi = "comma") |>
     req_perform() |>
     resp_body_json()
 
+#  res
   res$results |> map(parse_task)
 #    purrr::modify_if(.p = \(x) is.null(x), .f = \(x) NA) #|>
 #    bind_rows() |>
@@ -216,7 +271,10 @@ meili_task <- function(task) {
 
 parse_task <- function(res) {
 
-  details <- res$details |> bind_rows()
+  details <-
+    res$details |>
+    purrr::discard_at("filterableAttributes") |>
+    bind_rows()
 
   error <- res$error |> bind_rows()
 
@@ -324,7 +382,7 @@ meili_search <- function(
     req_perform() |>
     resp_body_json()
 
-  res$hits |> dplyr::bind_rows()
+  structure(res$hits |> dplyr::bind_rows(), meta = res)
 }
 
 meili_health <- function() {
@@ -336,13 +394,14 @@ meili_health <- function() {
   res$status == "available"
 }
 
-#' Search for a name in hrfile (or other index)
+#' Search for a name in hrfile (or other index) with optional filters
 #'
 #' @param q the string to search for
 #' @param index the index to search in, default hrfile
+#' @param f filters to apply before search (optional)
 #' @importFrom purrr map_df
 #' @export
-search_name <- function(q, index = "hrfile") {
-  s <- \(q) meili_search(index, query = q)
+search_name <- function(q, index = "hrfile", f = NULL) {
+  s <- \(q) meili_search(index, query = q, filter = f)
   q |> purrr::map_df(s)
 }
